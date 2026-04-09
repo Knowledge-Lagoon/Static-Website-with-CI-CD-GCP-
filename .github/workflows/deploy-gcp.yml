@@ -5,8 +5,8 @@ on:
     branches: [main]
 
 env:
-  GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-  GCS_BUCKET_NAME: ${{ secrets.GCS_BUCKET_NAME }}
+  GCP_PROJECT_ID: playground-s-11-20eee978
+  GCS_BUCKET_NAME: kl-website-1775738478
 
 jobs:
   deploy:
