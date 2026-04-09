@@ -1,35 +1,32 @@
-name: Deploy to GCP
+name: Deploy to GCP Cloud Storage
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 env:
-  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-  GCS_BUCKET: ${{ secrets.GCS_BUCKET_NAME }}
+  GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  GCS_BUCKET_NAME: ${{ secrets.GCS_BUCKET_NAME }}
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
-    permissions:
-      contents: read
-      id-token: write
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Authenticate to Google Cloud
-      uses: google-github-actions/auth@v2
-      with:
-        workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
-        service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.GCP_PROJECT_ID }}
 
-    - name: Set up Google Cloud SDK
-      uses: google-github-actions/setup-gcloud@v2
+      - name: Authenticate with gcloud (Application Default Credentials)
+        run: |
+          gcloud auth application-default login --no-launch-browser || true
 
-    - name: Deploy to Cloud Storage
-      run: |
-        gsutil -m cp -r . gs://${{ env.GCS_BUCKET }}/
-        echo "✅ Deployment successful to gs://${{ env.GCS_BUCKET }}/"
+      - name: Deploy to Cloud Storage
+        run: |
+          gsutil -m cp -r . gs://${{ env.GCS_BUCKET_NAME }}/
+          echo "✅ Deployment complete!"
+          echo "🌐 URL: https://storage.googleapis.com/${{ env.GCS_BUCKET_NAME }}/index.html"
