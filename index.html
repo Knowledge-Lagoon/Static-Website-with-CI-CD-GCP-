@@ -1,19 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Static Website</title>
-</head>
-<body>
-    <header>
-        <h1>Welcome to My Static Website</h1>
-    </header>
-    <main>
-        <p>This is a simple static website template.</p>
-    </main>
-    <footer>
-        <p>&copy; 2026 Knowledge-Lagoon. All rights reserved.</p>
-    </footer>
-</body>
-</html>
+name: Deploy to GCP (Linux Labs)
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Deploy to Cloud Storage
+        run: |
+          gcloud storage cp index.html gs://${{ secrets.GCS_BUCKET_NAME }}/
+          echo "✅ Deployment complete!"
+          echo "🌐 Visit: https://storage.googleapis.com/${{ secrets.GCS_BUCKET_NAME }}/index.html"
